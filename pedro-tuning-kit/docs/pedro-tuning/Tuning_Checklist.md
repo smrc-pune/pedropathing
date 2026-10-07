@@ -147,7 +147,7 @@ Run the tests in this order ([Pedro docs: Test](https://pedropathing.com/docs/pa
 
 - [ ] Turns as each heading style asks while staying on the curve.
 
-If any test fails, go to *Fixing the Line Test* (Step 5 table) and *Our Line Test investigation* in the [main guide](Pedro_Pathing_Constants_Explained.md). If the fix changes Stage 1 or 2, redo every gate from there.
+If any test fails, go to *Fixing the Line Test* (the Compare the screen with the floor table) and *Our Line Test investigation* in the [main guide](Pedro_Pathing_Constants_Explained.md). If the fix changes Stage 1 or 2, redo every gate from there.
 
 ## Sign-off log
 

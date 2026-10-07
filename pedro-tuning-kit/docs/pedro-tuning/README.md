@@ -4,7 +4,7 @@ Guides, a checklist, a staged `Tuning.java` and a value checker for tuning Pedro
 
 | File | What it is |
 | --- | --- |
-| [Pedro_Pathing_Constants_Explained.md](Pedro_Pathing_Constants_Explained.md) (+ [PDF](Pedro_Pathing_Constants_Explained.pdf)) | The guide. Explains every value in `Constants.java`, with sources. Version 2.3 |
+| [Pedro_Pathing_Constants_Explained.md](Pedro_Pathing_Constants_Explained.md) (+ [PDF](Pedro_Pathing_Constants_Explained.pdf)) | The guide: why each value in `Constants.java` matters, with sources. Version 3 |
 | [Tuning_Checklist.md](Tuning_Checklist.md) (+ [PDF](Tuning_Checklist.pdf)) | Stage-by-stage checklist with a gate after each stage and a sign-off log |
 | [tuning-checker/index.html](tuning-checker/index.html) | Pedro Tuning Checker: paste `Constants.java` from up to 3 tuner runs to sanity-check, compare and average them |
 | [`TeamCode/.../pedro/Tuning.java`](../../TeamCode/src/main/java/org/firstinspires/ftc/teamcode/pedro/Tuning.java) | Staged `Tuning.java` (version 2). Goes with the checklist |
