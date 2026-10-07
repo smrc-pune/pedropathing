@@ -1,0 +1,692 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Pedro Tuning Checker - standalone copy. Open this file in any browser; no install or server needed. -->
+<style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Pedro Tuning Checker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a test-bench readout. Paste panel on top, then verdict strip, then checks, run comparison, pod placement, averaged config. One column, max 980px. */
+:root {
+  --bg: #f3f5f6;
+  --panel: #ffffff;
+  --ink: #17212b;
+  --muted: #5a6875;
+  --line: #d9e0e5;
+  --accent: #1d6a86;
+  --accent-soft: #e2eff4;
+  --good: #2f7a4d;
+  --good-soft: #e3f2e9;
+  --warn: #a8670f;
+  --warn-soft: #fbf0dc;
+  --bad: #b8401b;
+  --bad-soft: #fbe6de;
+  --info: #5a6875;
+  --info-soft: #eceff2;
+  --code-bg: #f6f8f9;
+  --f-display: "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11171c; --panel: #182129; --ink: #e4eaee; --muted: #9aa8b4; --line: #2b3742;
+    --accent: #5fb3d1; --accent-soft: #1b3440;
+    --good: #6cc492; --good-soft: #17301f; --warn: #e2a64a; --warn-soft: #34280f;
+    --bad: #f0845f; --bad-soft: #3a1d14; --info: #9aa8b4; --info-soft: #222c35; --code-bg: #131b21;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11171c; --panel: #182129; --ink: #e4eaee; --muted: #9aa8b4; --line: #2b3742;
+  --accent: #5fb3d1; --accent-soft: #1b3440;
+  --good: #6cc492; --good-soft: #17301f; --warn: #e2a64a; --warn-soft: #34280f;
+  --bad: #f0845f; --bad-soft: #3a1d14; --info: #9aa8b4; --info-soft: #222c35; --code-bg: #131b21;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 980px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 64px; display: grid; gap: 28px; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; letter-spacing: 0.01em; }
+h1 { font-size: 2.1rem; font-weight: 700; line-height: 1.1; }
+h2 { font-size: 1.45rem; font-weight: 600; }
+h3 { font-size: 1.1rem; font-weight: 600; }
+p { margin: 0; }
+a { color: var(--accent); }
+.lead { color: var(--muted); max-width: 68ch; margin-top: 8px; }
+.eyebrow { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+section { display: grid; gap: 14px; min-width: 0; }
+.sec-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
+.sec-head p { color: var(--muted); font-size: 0.9rem; max-width: 70ch; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; min-width: 0; }
+
+/* Paste panel */
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.tab { font: 500 0.88rem var(--f-body); border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 999px; padding: 6px 14px; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; }
+.tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--panel); }
+.tab .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+.tab .dot.on { background: var(--good); }
+.tab[aria-selected="true"] .dot.on { background: var(--panel); }
+textarea { width: 100%; min-height: 220px; resize: vertical; font: 0.8rem/1.45 var(--f-mono); color: var(--ink); background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+textarea:focus-visible, select:focus-visible, input:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.btn { font: 500 0.88rem var(--f-body); border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 8px; padding: 7px 12px; cursor: pointer; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--panel); }
+.note { font-size: 0.85rem; color: var(--muted); }
+.sample-flag { font-size: 0.85rem; background: var(--warn-soft); color: var(--ink); border-radius: 8px; padding: 8px 12px; }
+.parsed { font-size: 0.85rem; color: var(--muted); }
+
+/* Verdict strip */
+.verdict { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.vcell { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: grid; gap: 2px; }
+.vcell .n { font: 700 2rem/1 var(--f-display); font-variant-numeric: tabular-nums; }
+.vcell .l { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.vcell.bad .n { color: var(--bad); } .vcell.warn .n { color: var(--warn); } .vcell.good .n { color: var(--good); } .vcell.info .n { color: var(--info); }
+@media (max-width: 560px) { .verdict { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Checks */
+.checks { display: grid; gap: 10px; }
+.check { display: grid; grid-template-columns: 6px 1fr; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.check .stripe { background: var(--info); }
+.check.pass .stripe { background: var(--good); } .check.warn .stripe { background: var(--warn); } .check.fail .stripe { background: var(--bad); }
+.check .body { padding: 12px 14px; display: grid; gap: 6px; min-width: 0; }
+.check .top { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: baseline; }
+.pill { font: 600 0.7rem var(--f-mono); letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; }
+.pill.pass { background: var(--good-soft); color: var(--good); } .pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.fail { background: var(--bad-soft); color: var(--bad); } .pill.info { background: var(--info-soft); color: var(--info); }
+.tag { font-size: 0.72rem; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 1px 8px; }
+.check .title { font-weight: 600; }
+.check .result { font-family: var(--f-mono); font-size: 0.85rem; overflow-wrap: anywhere; }
+.check .why { font-size: 0.88rem; color: var(--muted); max-width: 75ch; }
+.check .src { font-size: 0.8rem; }
+.group-label { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+
+/* Table */
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: 0.85rem; min-width: 640px; }
+th, td { padding: 8px 10px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; white-space: normal; }
+thead th { font: 600 0.75rem var(--f-body); color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; background: var(--code-bg); }
+td.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+td.odd { background: var(--warn-soft); }
+tr:last-child td { border-bottom: 0; }
+.spread { font-family: var(--f-mono); font-weight: 500; }
+.spread.pass { color: var(--good); } .spread.warn { color: var(--warn); } .spread.fail { color: var(--bad); }
+
+/* Pod placement */
+.podgrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 640px) { .podgrid { grid-template-columns: 1fr; } }
+.field { display: grid; gap: 4px; }
+.field label { font-size: 0.85rem; font-weight: 500; }
+select, input[type="number"] { font: 0.9rem var(--f-body); color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; width: 100%; }
+.podcard { display: grid; gap: 10px; }
+
+/* Code out */
+pre.code { margin: 0; background: var(--code-bg); border: 1px solid var(--line); border-radius: 10px; padding: 14px; overflow-x: auto; font: 0.78rem/1.5 var(--f-mono); color: var(--ink); }
+.empty { color: var(--muted); font-size: 0.9rem; }
+footer { font-size: 0.82rem; color: var(--muted); display: grid; gap: 6px; border-top: 1px solid var(--line); padding-top: 16px; }
+@media (prefers-reduced-motion: no-preference) { .check { transition: border-color .15s; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">FTC · Pedro Pathing 3 · Foresight + Pinpoint</div>
+    <h1>Pedro Tuning Checker</h1>
+    <p class="lead">Paste the <code>Constants.java</code> (or the AutoTune Java tab) from up to three tuner runs. The checker reads every value, runs the sanity checks from our tuning guide, compares the runs, and gives you an averaged config to copy back.</p>
+  </header>
+
+  <section aria-labelledby="paste-h">
+    <div class="sec-head">
+      <h2 id="paste-h">1. Paste your runs</h2>
+      <p>Comments (<code>/* … */</code> and <code>//</code>) are ignored, so old commented-out blocks will not be read.</p>
+    </div>
+    <div class="panel" style="display:grid;gap:12px">
+      <div class="tabs" role="tablist" id="tabs"></div>
+      <div id="sampleFlag" class="sample-flag" hidden>Example loaded: Run 1 is the active config from our <code>Constants.java</code> (5 Oct 2026). Run 2 is the older <code>ForesightConfig</code> that is commented out in the same file. In section 4 the strafe pod is set to “In front of centre” because our pods are mounted at the front. Replace all of this with your own runs.</div>
+      <textarea id="paste" spellcheck="false" aria-label="Paste Constants.java for this run"></textarea>
+      <div class="row">
+        <button class="btn primary" id="checkBtn" type="button">Check values</button>
+        <button class="btn" id="clearBtn" type="button">Clear this run</button>
+        <button class="btn" id="sampleBtn" type="button">Load example</button>
+        <span class="parsed" id="parsedNote"></span>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="sum-h">
+    <div class="sec-head"><h2 id="sum-h">2. Summary</h2><p id="sumNote"></p></div>
+    <div class="verdict" id="verdict"></div>
+  </section>
+
+  <section aria-labelledby="checks-h">
+    <div class="sec-head">
+      <h2 id="checks-h">3. Checks</h2>
+      <p>Checks marked <span class="tag">our check</span> use our own reasoning or thresholds; the rest come straight from the tuner code or the docs.</p>
+    </div>
+    <div class="checks" id="checks"></div>
+  </section>
+
+  <section aria-labelledby="pod-h">
+    <div class="sec-head">
+      <h2 id="pod-h">4. Do the pod offsets match the robot?</h2>
+      <p>Stand behind the robot, facing the side that leads when it drives forward. Tell the checker where each pod really is. goBILDA: X pod offset left is +, right is −; Y pod offset in front is +, behind is −.</p>
+    </div>
+    <div class="panel podgrid">
+      <div class="podcard">
+        <h3>X (forward) pod</h3>
+        <div class="field"><label for="xSide">Which side of the centre is it on?</label>
+          <select id="xSide"><option value="unsure">Not sure yet</option><option value="left">Left of centre</option><option value="right">Right of centre</option><option value="centre">On the centre line</option></select></div>
+        <div class="field"><label for="xDist">Measured sideways distance (in, optional)</label><input id="xDist" type="number" step="0.01" min="0" placeholder="e.g. 3.0"></div>
+      </div>
+      <div class="podcard">
+        <h3>Y (strafe) pod</h3>
+        <div class="field"><label for="ySide">Is it in front of or behind the centre?</label>
+          <select id="ySide"><option value="unsure">Not sure yet</option><option value="front">In front of centre</option><option value="behind">Behind centre</option><option value="centre">On the centre line</option></select></div>
+        <div class="field"><label for="yDist">Measured forward/back distance (in, optional)</label><input id="yDist" type="number" step="0.01" min="0" placeholder="e.g. 6.5"></div>
+      </div>
+    </div>
+    <div class="checks" id="podChecks"></div>
+  </section>
+
+  <section aria-labelledby="runs-h">
+    <div class="sec-head">
+      <h2 id="runs-h">5. Compare runs</h2>
+      <p>Spread = (largest − smallest) ÷ average. Our thresholds: up to 10% fine, up to 25% look again, above 25% re-run. The value farthest from the others is shaded.</p>
+    </div>
+    <div id="runsTable"></div>
+  </section>
+
+  <section aria-labelledby="avg-h">
+    <div class="sec-head">
+      <h2 id="avg-h">6. Averaged ForesightConfig</h2>
+      <p>Each value is the average of the runs that have it, in the same layout AutoTune writes. Averaging keeps the large ÷ small kP ratio unchanged.</p>
+    </div>
+    <div class="row"><button class="btn primary" id="copyBtn" type="button">Copy config</button><span class="note" id="copyNote"></span></div>
+    <pre class="code" id="avgCode"></pre>
+  </section>
+
+  <footer>
+    <p>Sources: <a href="https://github.com/Pedro-Pathing/Quickstart/blob/master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/pedro/procedures/ForesightTuner.java" target="_blank" rel="noopener">ForesightTuner.java</a> · <a href="https://github.com/Pedro-Pathing/Quickstart/blob/master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/pedro/procedures/PinpointTuner.java" target="_blank" rel="noopener">PinpointTuner.java</a> · <a href="https://pedropathing.com/docs/pathing/tuning/constants" target="_blank" rel="noopener">Pedro docs: Constants</a> · <a href="https://pedropathing.com/docs/pathing/reference/controllers" target="_blank" rel="noopener">Controllers</a> · <a href="https://pedropathing.com/docs/pathing/reference/deceleration" target="_blank" rel="noopener">Deceleration</a> · <a href="https://pedropathing.com/docs/pathing/faq" target="_blank" rel="noopener">Troubleshooting</a> · <a href="https://www.gobilda.com/content/user_manuals/3110-0002-0001%20User%20Guide.pdf" target="_blank" rel="noopener">goBILDA Pinpoint guide</a></p>
+    <p>A passing check means the numbers are consistent, not that the robot drives well. The Hold and Line tests are still the final judge.</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var SRC = {
+    tuner: { label: "ForesightTuner.java", url: "https://github.com/Pedro-Pathing/Quickstart/blob/master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/pedro/procedures/ForesightTuner.java" },
+    pinTuner: { label: "PinpointTuner.java", url: "https://github.com/Pedro-Pathing/Quickstart/blob/master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/pedro/procedures/PinpointTuner.java" },
+    constants: { label: "Pedro docs: Constants", url: "https://pedropathing.com/docs/pathing/tuning/constants" },
+    controllers: { label: "Pedro docs: Controllers", url: "https://pedropathing.com/docs/pathing/reference/controllers" },
+    decel: { label: "Pedro docs: Deceleration", url: "https://pedropathing.com/docs/pathing/reference/deceleration" },
+    faq: { label: "Pedro docs: Troubleshooting", url: "https://pedropathing.com/docs/pathing/faq" },
+    localization: { label: "Pedro docs: Localization", url: "https://pedropathing.com/docs/pathing/tuning/localization" },
+    gobilda: { label: "goBILDA guide, p. 2", url: "https://www.gobilda.com/content/user_manuals/3110-0002-0001%20User%20Guide.pdf" },
+    paper: { label: "Pedro paper (Sripada & Henderson), footnote 2" }
+  };
+
+  var SAMPLE1 = [
+    "public static Follower create(HardwareMap h) {",
+    "    return new Follower(",
+    "            new PinpointLocalizer(h, localizerConfig),",
+    "            new Mecanum(h, drivetrainConfig),",
+    "            null //new Foresight(foresightConfig)",
+    "    );",
+    "}",
+    "public static PinpointConfig localizerConfig = new PinpointConfig(c -> {",
+    "    c.name.set(\"pinpoint\");",
+    "    c.podType.set(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);",
+    "    c.xPodOffset.set(-3.064670412559209);",
+    "    c.yPodOffset.set(-6.651631152535987);",
+    "    c.xPodDirection.set(GoBildaPinpointDriver.EncoderDirection.FORWARD);",
+    "    c.yPodDirection.set(GoBildaPinpointDriver.EncoderDirection.FORWARD);",
+    "    c.globalDistanceUnit.set(DistanceUnit.INCH);",
+    "    c.offsetUnits.set(DistanceUnit.INCH);",
+    "});",
+    "public static ForesightConfig foresightConfig = new ForesightConfig(",
+    "        c -> {",
+    "            Controller primaryTranslationalForward = Controller.proportional(0.3619333434031065);",
+    "            Controller secondaryTranslationalForward = Controller.proportional(0.13372469935039807);",
+    "            Controller primaryTranslationalLateral = Controller.proportional(0.36994649826396636);",
+    "            Controller secondaryTranslationalLateral = Controller.proportional(0.13668534595604453);",
+    "",
+    "            c.forwardTranslational.set(Controller.piecewise(secondaryTranslationalForward).put(2.5, primaryTranslationalForward));",
+    "            c.strafeTranslational.set(Controller.piecewise(secondaryTranslationalLateral).put(2.5, primaryTranslationalLateral));",
+    "",
+    "            c.coast.set(Controller.proportionalFeedforward(0.017764441073408282));",
+    "            c.brake.set(Controller.proportionalFeedforward(0.01509977491239704));",
+    "",
+    "            c.headingFeedback.set(Controller.proportional(4.775572651640032));",
+    "            c.headingBrakeCoefficients.set(Vector2D.cartesian(0.0439395504590883, 0.008127650265069605));",
+    "",
+    "            c.linearBrakeCoefficients.set(Matrix.diag(0.051829026810856466, 0.036091660936047085));",
+    "            c.quadraticBrakeCoefficients.set(Matrix.diag(0.002440127935743068, 0.0027096858495569602));",
+    "",
+    "            c.maxAchievableForwardVelocity.set(57.644344471193236);",
+    "            c.maxAchievableStrafeVelocity.set(45.21179971862161);",
+    "            c.naturalForwardDeceleration.set(34.55323426401742);",
+    "            c.naturalStrafeDeceleration.set(70.68828084322546);",
+    "        }",
+    ");"
+  ].join("\n");
+
+  var SAMPLE2 = [
+    "public static ForesightConfig foresightConfig = new ForesightConfig(",
+    "        c -> {",
+    "            Controller primaryTranslationalForward = Controller.proportional(0.2485386205241494);",
+    "            Controller secondaryTranslationalForward = Controller.proportional(0.09182837920942237);",
+    "            Controller primaryTranslationalLateral = Controller.proportional(0.34308277899419687);",
+    "            Controller secondaryTranslationalLateral = Controller.proportional(0.1267599194976637);",
+    "",
+    "            c.forwardTranslational.set(Controller.piecewise(secondaryTranslationalForward).put(2.5, primaryTranslationalForward));",
+    "            c.strafeTranslational.set(Controller.piecewise(secondaryTranslationalLateral).put(2.5, primaryTranslationalLateral));",
+    "",
+    "            c.coast.set(Controller.proportionalFeedforward(0.018149119517818228));",
+    "            c.brake.set(Controller.proportionalFeedforward(0.015426751590145492));",
+    "",
+    "            c.headingFeedback.set(Controller.proportional(5.5314587880057795));",
+    "            c.headingBrakeCoefficients.set(Vector2D.cartesian(0.04406559683979913, 0.009205975604435718));",
+    "",
+    "            c.linearBrakeCoefficients.set(Matrix.diag(0.06641774992485691, 0.04556402266024595));",
+    "            c.quadraticBrakeCoefficients.set(Matrix.diag(0.0022634409265479597, 0.0027417651782087214));",
+    "",
+    "            c.maxAchievableForwardVelocity.set(58.21329685781924);",
+    "            c.maxAchievableStrafeVelocity.set(44.63266512677437);",
+    "            c.naturalForwardDeceleration.set(31.93379420515196);",
+    "            c.naturalStrafeDeceleration.set(61.259535167683794);",
+    "        }",
+    ");"
+  ].join("\n");
+
+  // Values the tuner writes, in AutoTune order
+  var FIELDS = [
+    { k: "fwdLarge", label: "Forward translational large kP (primary)", unit: "" },
+    { k: "fwdSmall", label: "Forward translational small kP (secondary)", unit: "" },
+    { k: "strLarge", label: "Strafe translational large kP (primary)", unit: "" },
+    { k: "strSmall", label: "Strafe translational small kP (secondary)", unit: "" },
+    { k: "coastKV", label: "Coast kV", unit: "" },
+    { k: "brakeKV", label: "Brake kV", unit: "" },
+    { k: "headingKP", label: "Heading kP", unit: "" },
+    { k: "hBrakeLin", label: "Heading brake linear", unit: "" },
+    { k: "hBrakeQuad", label: "Heading brake quadratic", unit: "" },
+    { k: "fBrakeLin", label: "Forward brake linear", unit: "" },
+    { k: "sBrakeLin", label: "Strafe brake linear", unit: "" },
+    { k: "fBrakeQuad", label: "Forward brake quadratic", unit: "" },
+    { k: "sBrakeQuad", label: "Strafe brake quadratic", unit: "" },
+    { k: "vFwd", label: "Max forward velocity", unit: "in/s" },
+    { k: "vStr", label: "Max strafe velocity", unit: "in/s" },
+    { k: "dFwd", label: "Natural forward deceleration", unit: "in/s²" },
+    { k: "dStr", label: "Natural strafe deceleration", unit: "in/s²" }
+  ];
+  var POD_FIELDS = [
+    { k: "xOff", label: "xPodOffset", unit: "in" },
+    { k: "yOff", label: "yPodOffset", unit: "in" }
+  ];
+
+  var N = "([-+]?(?:\\d+\\.?\\d*|\\.\\d+)(?:[eE][-+]?\\d+)?)";
+  function stripComments(s) {
+    return s.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/\/\/[^\n\r]*/g, " ");
+  }
+  function grab(s, re) { var m = s.match(re); return m ? m : null; }
+  function num(s, pattern) { var m = grab(s, new RegExp(pattern)); return m ? parseFloat(m[1]) : undefined; }
+
+  function parse(text) {
+    var s = stripComments(text || "");
+    var r = {};
+    var ctrl = {};
+    var reCtrl = new RegExp("Controller\\s+(\\w+)\\s*=\\s*Controller\\.proportional\\(\\s*" + N + "\\s*\\)", "g");
+    var m;
+    while ((m = reCtrl.exec(s))) { if (!(m[1] in ctrl)) ctrl[m[1]] = parseFloat(m[2]); }
+    function piece(name) {
+      var re = new RegExp(name + "\\.set\\(\\s*Controller\\.piecewise\\(\\s*([\\w.()\\s-]+?)\\s*\\)\\s*\\.put\\(\\s*" + N + "\\s*,\\s*([\\w.()\\s-]+?)\\s*\\)\\s*\\)");
+      var mm = s.match(re);
+      if (!mm) return null;
+      function val(tok) {
+        tok = tok.trim();
+        if (tok in ctrl) return ctrl[tok];
+        var lit = tok.match(new RegExp("Controller\\.proportional\\(\\s*" + N + "\\s*\\)"));
+        return lit ? parseFloat(lit[1]) : undefined;
+      }
+      return { small: val(mm[1]), thr: parseFloat(mm[2]), large: val(mm[3]) };
+    }
+    var pf = piece("forwardTranslational"), ps = piece("strafeTranslational");
+    if (pf) { r.fwdSmall = pf.small; r.fwdLarge = pf.large; r.fwdThr = pf.thr; }
+    if (ps) { r.strSmall = ps.small; r.strLarge = ps.large; r.strThr = ps.thr; }
+    r.coastKV = num(s, "coast\\.set\\(\\s*Controller\\.proportionalFeedforward\\(\\s*" + N);
+    r.brakeKV = num(s, "brake\\.set\\(\\s*Controller\\.proportionalFeedforward\\(\\s*" + N);
+    r.headingKP = num(s, "headingFeedback\\.set\\(\\s*Controller\\.proportional\\(\\s*" + N);
+    var hb = grab(s, new RegExp("headingBrakeCoefficients\\.set\\(\\s*Vector2D\\.cartesian\\(\\s*" + N + "\\s*,\\s*" + N));
+    if (hb) { r.hBrakeLin = parseFloat(hb[1]); r.hBrakeQuad = parseFloat(hb[2]); }
+    var lb = grab(s, new RegExp("linearBrakeCoefficients\\.set\\(\\s*Matrix\\.diag\\(\\s*" + N + "\\s*,\\s*" + N));
+    if (lb) { r.fBrakeLin = parseFloat(lb[1]); r.sBrakeLin = parseFloat(lb[2]); }
+    var qb = grab(s, new RegExp("quadraticBrakeCoefficients\\.set\\(\\s*Matrix\\.diag\\(\\s*" + N + "\\s*,\\s*" + N));
+    if (qb) { r.fBrakeQuad = parseFloat(qb[1]); r.sBrakeQuad = parseFloat(qb[2]); }
+    r.vFwd = num(s, "maxAchievableForwardVelocity\\.set\\(\\s*" + N);
+    r.vStr = num(s, "maxAchievableStrafeVelocity\\.set\\(\\s*" + N);
+    r.dFwd = num(s, "naturalForwardDeceleration\\.set\\(\\s*" + N);
+    r.dStr = num(s, "naturalStrafeDeceleration\\.set\\(\\s*" + N);
+    // Pinpoint
+    r.xOff = num(s, "xPodOffset\\.set\\(\\s*" + N);
+    r.yOff = num(s, "yPodOffset\\.set\\(\\s*" + N);
+    var xd = grab(s, /xPodDirection\.set\(\s*[\w.]*?(FORWARD|REVERSED)\s*\)/); r.xDir = xd ? xd[1] : undefined;
+    var yd = grab(s, /yPodDirection\.set\(\s*[\w.]*?(FORWARD|REVERSED)\s*\)/); r.yDir = yd ? yd[1] : undefined;
+    var pt = grab(s, /podType\.set\(\s*[\w.]*?\.(\w+)\s*\)/); r.podType = pt ? pt[1] : undefined;
+    var ou = grab(s, /offsetUnits\.set\(\s*DistanceUnit\.(\w+)\s*\)/); r.offUnit = ou ? ou[1] : undefined;
+    // create()
+    var fol = grab(s, /new\s+Follower\s*\(([\s\S]*?)\)\s*;/);
+    if (fol) { r.createSeen = true; r.createHasForesight = /new\s+Foresight\s*\(/.test(fol[1]); }
+    r.foresightCount = FIELDS.filter(function (f) { return isFinite(r[f.k]); }).length;
+    r.hasPod = isFinite(r.xOff) || isFinite(r.yOff);
+    return r;
+  }
+
+  // ---------- state ----------
+  var KEY = "pedro-tuning-checker-v1";
+  var state = { runs: ["", "", ""], active: 0, sample: false, pod: { xSide: "unsure", xDist: "", ySide: "front", yDist: "" } };
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (raw) { var d = JSON.parse(raw); if (d && Array.isArray(d.runs)) { state = Object.assign(state, d); return true; } }
+    } catch (e) {}
+    return false;
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+  function loadSample() {
+    state.runs = [SAMPLE1, SAMPLE2, ""]; state.active = 0; state.sample = true;
+    state.pod = { xSide: "unsure", xDist: "", ySide: "front", yDist: "" };
+  }
+
+  var $ = function (id) { return document.getElementById(id); };
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[c]; }); }
+  function fmt(v, d) { if (!isFinite(v)) return "—"; d = d === undefined ? 4 : d; var a = Math.abs(v); if (a !== 0 && (a < 0.001)) return v.toExponential(2); return Number(v.toFixed(d)).toString(); }
+  function pct(v) { return isFinite(v) ? (v * 100).toFixed(1) + "%" : "—"; }
+
+  function renderTabs(parsed) {
+    var html = "";
+    for (var i = 0; i < 3; i++) {
+      var p = parsed[i];
+      var on = p && (p.foresightCount > 0 || p.hasPod);
+      html += '<button class="tab" role="tab" id="tab' + i + '" aria-selected="' + (i === state.active) + '" data-i="' + i + '"><span class="dot' + (on ? " on" : "") + '"></span>Run ' + (i + 1) + "</button>";
+    }
+    $("tabs").innerHTML = html;
+    Array.prototype.forEach.call($("tabs").querySelectorAll(".tab"), function (b) {
+      b.addEventListener("click", function () { state.runs[state.active] = $("paste").value; state.active = +b.getAttribute("data-i"); save(); refresh(); });
+    });
+  }
+
+  function chk(list, o) { list.push(o); }
+  function srcHtml(arr) {
+    if (!arr || !arr.length) return "";
+    return '<div class="src">Source: ' + arr.map(function (s) { return s.url ? '<a href="' + s.url + '" target="_blank" rel="noopener">' + esc(s.label) + "</a>" : esc(s.label); }).join(" · ") + "</div>";
+  }
+  function checkHtml(c) {
+    var pillText = { pass: "Pass", warn: "Look again", fail: "Problem", info: "Info" }[c.status];
+    return '<article class="check ' + c.status + '"><div class="stripe"></div><div class="body">' +
+      '<div class="top"><span class="pill ' + c.status + '">' + pillText + '</span><span class="title">' + esc(c.title) + "</span>" + (c.ours ? '<span class="tag">our check</span>' : "") + "</div>" +
+      (c.result ? '<div class="result">' + c.result + "</div>" : "") +
+      (c.why ? '<div class="why">' + c.why + "</div>" : "") + srcHtml(c.src) + "</div></article>";
+  }
+
+  function runChecks(p, runLabel) {
+    var L = [];
+    var missing = FIELDS.filter(function (f) { return !isFinite(p[f.k]); });
+    if (p.foresightCount === 0) {
+      chk(L, { status: "info", title: runLabel + ": no ForesightConfig values found", why: "Paste a ForesightConfig to run the number checks." });
+    } else if (missing.length) {
+      chk(L, { status: "fail", title: runLabel + ": " + missing.length + " tuner value(s) missing", result: missing.map(function (f) { return esc(f.label); }).join(", "), why: "AutoTune writes all 17 values. A missing one usually means a copy-paste slip.", src: [SRC.tuner] });
+    } else {
+      chk(L, { status: "pass", title: runLabel + ": all 17 tuner values found", src: [SRC.tuner] });
+    }
+    if (p.foresightCount > 0) {
+      var bad = FIELDS.filter(function (f) { var v = p[f.k]; return isFinite(v) && !(v > 0); });
+      chk(L, bad.length
+        ? { status: "fail", title: "Zero or negative values", result: bad.map(function (f) { return esc(f.label) + " = " + fmt(p[f.k]); }).join("; "), why: "Speeds, decelerations, gains and brake coefficients should all be positive. A zero or negative value points to a failed tuner step; re-run that step.", ours: true }
+        : { status: "pass", title: "Every value is positive", ours: true });
+
+      if (isFinite(p.coastKV) && isFinite(p.brakeKV)) {
+        var r = p.brakeKV / p.coastKV;
+        chk(L, { status: Math.abs(r - 0.85) <= 0.02 ? "pass" : "warn", title: "Brake kV ÷ coast kV ≈ 0.85",
+          result: fmt(p.brakeKV, 5) + " ÷ " + fmt(p.coastKV, 5) + " = " + fmt(r, 3),
+          why: "The tuner sets brake kV to exactly 0.85 × coast kV. A different ratio means one of them was edited or the two came from different runs.", src: [SRC.tuner] });
+      }
+      [["Forward", "fwdLarge", "fwdSmall", "fwdThr"], ["Strafe", "strLarge", "strSmall", "strThr"]].forEach(function (a) {
+        var lg = p[a[1]], sm = p[a[2]];
+        if (isFinite(lg) && isFinite(sm)) {
+          var ratio = lg / sm, target = Math.pow(10.2 / 6.2, 2);
+          var swapped = lg < sm;
+          chk(L, { status: swapped ? "fail" : (Math.abs(ratio / target - 1) <= 0.02 ? "pass" : "warn"),
+            title: a[0] + " translational: large kP ÷ small kP ≈ 2.71",
+            result: fmt(lg) + " ÷ " + fmt(sm) + " = " + fmt(ratio, 3) + " (tuner gives " + fmt(target, 3) + ")",
+            why: swapped ? "The large controller is smaller than the small one. They are probably swapped in the piecewise line: the small controller goes inside piecewise(...), the large one in put(threshold, ...)."
+              : "Both kPs come from one test using factors 10.2 and 6.2, so the tuner always gives (10.2 ÷ 6.2)² ≈ 2.71. A different ratio means a value was edited by hand.",
+            src: [SRC.tuner, SRC.controllers] });
+        }
+        if (isFinite(p[a[3]]) && p[a[3]] !== 2.5) {
+          chk(L, { status: "info", title: a[0] + " piecewise switch point is " + fmt(p[a[3]]) + " in", why: "AutoTune writes 2.5 in. Below the switch point the small controller is used; above it, the large one.", src: [SRC.tuner, SRC.controllers] });
+        }
+      });
+      if (isFinite(p.coastKV) && isFinite(p.vFwd)) {
+        var vk = 1 / p.coastKV, d = vk / p.vFwd - 1;
+        chk(L, { status: Math.abs(d) <= 0.15 ? "pass" : (Math.abs(d) <= 0.3 ? "warn" : "fail"), ours: true,
+          title: "1 ÷ coast kV is close to max forward velocity",
+          result: "1 ÷ " + fmt(p.coastKV, 5) + " = " + fmt(vk, 1) + " in/s vs " + fmt(p.vFwd, 1) + " in/s (" + (d >= 0 ? "+" : "") + pct(d) + ")",
+          why: "1 ÷ coast kV is the speed per unit of power the tuner measured at 40% power. The max-velocity test measured full-power speed. Two separate tests agreeing is a good sign. Our thresholds: within 15% pass, within 30% look again." , src: [SRC.tuner] });
+      }
+      [["Forward", "vFwd", "dFwd", "fBrakeLin", "fBrakeQuad"], ["Strafe", "vStr", "dStr", "sBrakeLin", "sBrakeQuad"]].forEach(function (a) {
+        var v = p[a[1]], dec = p[a[2]], lin = p[a[3]], q = p[a[4]];
+        if ([v, dec, lin, q].every(isFinite) && dec > 0) {
+          var brakeD = lin * v + q * v * v, coastD = v * v / (2 * dec);
+          chk(L, { status: brakeD < coastD ? "pass" : "warn", ours: true,
+            title: a[0] + ": braking stops sooner than coasting",
+            result: "At " + fmt(v, 1) + " in/s: braking " + fmt(brakeD, 1) + " in, coasting " + fmt(coastD, 1) + " in",
+            why: "Braking distance = linear × speed + quadratic × speed² (the curve the tuner fits). Coasting distance = speed² ÷ (2 × natural deceleration). Active braking should stop the robot in less distance than coasting with no power. Coasting distance also tells you how much room the speed tests need.",
+            src: [SRC.tuner, SRC.decel, SRC.paper] });
+        }
+      });
+      if (isFinite(p.hBrakeLin) && isFinite(p.hBrakeQuad)) {
+        var w = 3, ang = p.hBrakeLin * w + p.hBrakeQuad * w * w;
+        chk(L, { status: "info", title: "Heading braking, for reference", result: "Turning at 3 rad/s, the robot keeps turning about " + fmt(ang, 3) + " rad (" + fmt(ang * 180 / Math.PI, 1) + "°) while braking", src: [SRC.tuner] });
+      }
+    }
+    // Pinpoint + wiring
+    if (p.hasPod) {
+      if (p.offUnit && p.offUnit !== "INCH") chk(L, { status: "warn", title: "Offsets are not in inches", result: "offsetUnits = " + esc(p.offUnit), why: "This checker and our guide assume inches. Convert before comparing with a ruler." });
+      chk(L, { status: "info", title: "Pod directions: X " + esc(p.xDir || "?") + ", Y " + esc(p.yDir || "?"),
+        why: "Numbers cannot prove directions. Check with Tests → Localization: pushing toward the robot's forward must raise x, pushing to its left must raise y.", src: [SRC.localization, SRC.gobilda] });
+      if (p.podType) chk(L, { status: "info", title: "Pod type: " + esc(p.podType), why: "Must match the pods on the robot. A wrong type scales every distance." });
+    }
+    if (p.createSeen) {
+      chk(L, p.createHasForesight
+        ? { status: "pass", title: "create() passes new Foresight(foresightConfig)", src: [SRC.constants] }
+        : { status: "fail", title: "create() passes null instead of Foresight", result: "Third argument of new Follower(...) is not new Foresight(foresightConfig)", why: "OpModes that build their follower with Constants.create(...) will not use any tuned Foresight value. The docs only use null during the localization test.", src: [SRC.constants, SRC.localization] });
+    }
+    return L;
+  }
+
+  function podChecks(p) {
+    var L = [];
+    if (!p || !p.hasPod) { L.push({ status: "info", title: "No PinpointConfig found in Run 1", why: "Paste a file that includes the PinpointConfig to check the offsets." }); return L; }
+    var pod = state.pod;
+    function one(axis, val, side, dist) {
+      var label = axis === "x" ? "xPodOffset" : "yPodOffset";
+      var meaning = !isFinite(val) ? "not found" : (val === 0 ? "on the centre line"
+        : axis === "x" ? (val > 0 ? fmt(Math.abs(val), 2) + " in LEFT of centre" : fmt(Math.abs(val), 2) + " in RIGHT of centre")
+          : (val > 0 ? fmt(Math.abs(val), 2) + " in IN FRONT of centre" : fmt(Math.abs(val), 2) + " in BEHIND centre"));
+      var base = label + " = " + fmt(val, 3) + " → the file says the pod is " + meaning;
+      if (!isFinite(val)) return { status: "fail", title: label + " missing", why: "Paste the PinpointConfig." };
+      if (side === "unsure") return { status: "info", title: label + ": tell the checker where the pod is", result: base, why: "Pick the real side above to compare.", src: [SRC.gobilda] };
+      var want = { left: 1, right: -1, front: 1, behind: -1, centre: 0 }[side];
+      var have = val > 0.25 ? 1 : (val < -0.25 ? -1 : 0);
+      if (want !== have) {
+        return { status: "fail", title: label + ": sign does not match the robot", result: base,
+          why: "You said the pod is " + (side === "centre" ? "on the centre line" : side === "front" ? "in front of centre" : side === "behind" ? "behind centre" : side + " of centre") + ". Either the offset is wrong (re-run the offsets step or use a ruler value) or the robot's forward is the opposite side from what you think. Check which side leads in Tests → Driving.",
+          src: [SRC.gobilda, SRC.faq] };
+      }
+      var dnum = parseFloat(dist);
+      if (isFinite(dnum) && side !== "centre") {
+        var diff = Math.abs(Math.abs(val) - dnum);
+        return { status: diff <= 1 ? "pass" : "warn", ours: true, title: label + ": sign matches; ruler " + (diff <= 1 ? "agrees" : "differs by " + fmt(diff, 2) + " in"),
+          result: base + "; ruler " + fmt(dnum, 2) + " in",
+          why: diff <= 1 ? "Within our 1 in rule of thumb. Confirm with the spin test." : "More than our 1 in rule of thumb. A slide or an off-centre spin during the offsets step is a common cause. Re-run it, or use the ruler value, then do the spin test.",
+          src: [SRC.gobilda, SRC.pinTuner] };
+      }
+      return { status: "pass", title: label + ": sign matches the robot", result: base, why: "Add a ruler measurement to check the size too.", src: [SRC.gobilda] };
+    }
+    L.push(one("x", p.xOff, pod.xSide, pod.xDist));
+    L.push(one("y", p.yOff, pod.ySide, pod.yDist));
+    return L;
+  }
+
+  function median(a) { var b = a.slice().sort(function (x, y) { return x - y; }); var n = b.length; return n % 2 ? b[(n - 1) / 2] : (b[n / 2 - 1] + b[n / 2]) / 2; }
+  function spreadStatus(s) { return s <= 0.10 ? "pass" : (s <= 0.25 ? "warn" : "fail"); }
+
+  function runsTable(parsed) {
+    var idx = [0, 1, 2].filter(function (i) { return parsed[i] && (parsed[i].foresightCount > 0 || parsed[i].hasPod); });
+    if (idx.length < 2) { $("runsTable").innerHTML = '<p class="empty panel">Paste at least two runs to compare them.</p>'; return { rows: [] }; }
+    var rows = [], worst = [];
+    var all = FIELDS.concat(POD_FIELDS);
+    var head = "<thead><tr><th>Value</th>" + idx.map(function (i) { return "<th>Run " + (i + 1) + "</th>"; }).join("") + "<th>Average</th><th>Spread</th></tr></thead>";
+    var body = all.map(function (f) {
+      var vals = idx.map(function (i) { return parsed[i][f.k]; });
+      var got = vals.filter(isFinite);
+      if (got.length < 2) return "";
+      var avg = got.reduce(function (a, b) { return a + b; }, 0) / got.length;
+      var spread = Math.abs(avg) > 0 ? (Math.max.apply(null, got) - Math.min.apply(null, got)) / Math.abs(avg) : 0;
+      var isPod = f.k === "xOff" || f.k === "yOff";
+      var st = isPod ? ((Math.max.apply(null, got) - Math.min.apply(null, got)) <= 0.5 ? "pass" : "warn") : spreadStatus(spread);
+      var oddI = -1;
+      if (st !== "pass") { var med = median(got), far = -1; vals.forEach(function (v, j) { if (isFinite(v) && Math.abs(v - med) > far) { far = Math.abs(v - med); oddI = j; } }); }
+      if (st !== "pass") worst.push({ label: f.label, st: st });
+      var spreadTxt = isPod ? fmt(Math.max.apply(null, got) - Math.min.apply(null, got), 2) + " in" : pct(spread);
+      return "<tr><td>" + esc(f.label) + (f.unit ? ' <span class="note">(' + f.unit + ")</span>" : "") + "</td>" +
+        vals.map(function (v, j) { return '<td class="num' + (j === oddI ? " odd" : "") + '">' + fmt(v) + "</td>"; }).join("") +
+        '<td class="num">' + fmt(avg) + '</td><td class="spread ' + st + '">' + spreadTxt + "</td></tr>";
+    }).join("");
+    $("runsTable").innerHTML = '<div class="tablewrap"><table>' + head + "<tbody>" + body + "</tbody></table></div>" +
+      '<p class="note">Offsets use a fixed limit instead: a difference over 0.5 in between runs is flagged (our threshold).</p>';
+    return { rows: worst, count: idx.length };
+  }
+
+  function averaged(parsed) {
+    var idx = [0, 1, 2].filter(function (i) { return parsed[i] && parsed[i].foresightCount > 0; });
+    if (!idx.length) return null;
+    var a = {};
+    FIELDS.concat([{ k: "fwdThr" }, { k: "strThr" }]).forEach(function (f) {
+      var got = idx.map(function (i) { return parsed[i][f.k]; }).filter(isFinite);
+      a[f.k] = got.length ? got.reduce(function (x, y) { return x + y; }, 0) / got.length : NaN;
+    });
+    a.n = idx.length;
+    return a;
+  }
+  function v(x) { return isFinite(x) ? String(x) : "/* missing */ 0"; }
+  function codeFor(a) {
+    var ft = isFinite(a.fwdThr) ? a.fwdThr : 2.5, st = isFinite(a.strThr) ? a.strThr : 2.5;
+    return [
+      "// Averaged from " + a.n + " run" + (a.n > 1 ? "s" : "") + " with Pedro Tuning Checker",
+      "public static ForesightConfig foresightConfig = new ForesightConfig(",
+      "        c -> {",
+      "            Controller primaryTranslationalForward = Controller.proportional(" + v(a.fwdLarge) + ");",
+      "            Controller secondaryTranslationalForward = Controller.proportional(" + v(a.fwdSmall) + ");",
+      "            Controller primaryTranslationalLateral = Controller.proportional(" + v(a.strLarge) + ");",
+      "            Controller secondaryTranslationalLateral = Controller.proportional(" + v(a.strSmall) + ");",
+      "",
+      "            c.forwardTranslational.set(Controller.piecewise(secondaryTranslationalForward).put(" + ft + ", primaryTranslationalForward));",
+      "            c.strafeTranslational.set(Controller.piecewise(secondaryTranslationalLateral).put(" + st + ", primaryTranslationalLateral));",
+      "",
+      "            c.coast.set(Controller.proportionalFeedforward(" + v(a.coastKV) + "));",
+      "            c.brake.set(Controller.proportionalFeedforward(" + v(a.brakeKV) + "));",
+      "",
+      "            c.headingFeedback.set(Controller.proportional(" + v(a.headingKP) + "));",
+      "            c.headingBrakeCoefficients.set(Vector2D.cartesian(" + v(a.hBrakeLin) + ", " + v(a.hBrakeQuad) + "));",
+      "",
+      "            c.linearBrakeCoefficients.set(Matrix.diag(" + v(a.fBrakeLin) + ", " + v(a.sBrakeLin) + "));",
+      "            c.quadraticBrakeCoefficients.set(Matrix.diag(" + v(a.fBrakeQuad) + ", " + v(a.sBrakeQuad) + "));",
+      "",
+      "            c.maxAchievableForwardVelocity.set(" + v(a.vFwd) + ");",
+      "            c.maxAchievableStrafeVelocity.set(" + v(a.vStr) + ");",
+      "            c.naturalForwardDeceleration.set(" + v(a.dFwd) + ");",
+      "            c.naturalStrafeDeceleration.set(" + v(a.dStr) + ");",
+      "        }",
+      ");"
+    ].join("\n");
+  }
+
+  function refresh() {
+    var parsed = state.runs.map(function (t) { return t && t.trim() ? parse(t) : null; });
+    renderTabs(parsed);
+    var ta = $("paste");
+    if (ta.value !== state.runs[state.active]) ta.value = state.runs[state.active];
+    $("sampleFlag").hidden = !state.sample;
+    var p = parsed[state.active];
+    $("parsedNote").textContent = p ? ("Run " + (state.active + 1) + ": " + p.foresightCount + " of 17 Foresight values" + (p.hasPod ? ", Pinpoint offsets" : "") + (p.createSeen ? ", create()" : "") + " found") : "Run " + (state.active + 1) + " is empty.";
+
+    // checks
+    var html = "", all = [];
+    parsed.forEach(function (pp, i) {
+      if (!pp) return;
+      var L = runChecks(pp, "Run " + (i + 1));
+      all = all.concat(L);
+      html += '<div class="group-label">Run ' + (i + 1) + "</div>" + L.map(checkHtml).join("");
+    });
+    $("checks").innerHTML = html || '<p class="empty panel">Paste a run above to see the checks.</p>';
+
+    var firstPod = parsed.filter(function (q) { return q && q.hasPod; })[0] || parsed[0];
+    var P = podChecks(firstPod);
+    all = all.concat(P);
+    $("podChecks").innerHTML = P.map(checkHtml).join("");
+
+    var cmp = runsTable(parsed);
+    cmp.rows.forEach(function (r) { all.push({ status: r.st }); });
+
+    var c = { fail: 0, warn: 0, pass: 0, info: 0 };
+    all.forEach(function (x) { c[x.status]++; });
+    $("verdict").innerHTML = [["fail", "Problems"], ["warn", "Look again"], ["pass", "Passed"], ["info", "For reference"]].map(function (a) {
+      var cls = a[0] === "fail" ? "bad" : a[0] === "pass" ? "good" : a[0];
+      return '<div class="vcell ' + cls + '"><span class="n">' + c[a[0]] + '</span><span class="l">' + a[1] + "</span></div>";
+    }).join("");
+    $("sumNote").textContent = c.fail ? "Fix the problems first, starting with the Pinpoint offsets and create()." : (c.warn ? "No hard problems. Review the amber items." : "Everything checked is consistent.");
+
+    var avg = averaged(parsed);
+    $("avgCode").textContent = avg ? codeFor(avg) : "Paste at least one ForesightConfig to build the averaged config.";
+    $("copyBtn").disabled = !avg;
+  }
+
+  // ---------- wire up ----------
+  if (!load() || !state.runs.some(function (t) { return t && t.trim(); })) loadSample();
+  $("xSide").value = state.pod.xSide; $("ySide").value = state.pod.ySide; $("xDist").value = state.pod.xDist; $("yDist").value = state.pod.yDist;
+
+  var timer = null;
+  $("paste").addEventListener("input", function () {
+    state.runs[state.active] = $("paste").value; state.sample = false;
+    clearTimeout(timer); timer = setTimeout(function () { save(); refresh(); }, 300);
+  });
+  $("checkBtn").addEventListener("click", function () { state.runs[state.active] = $("paste").value; save(); refresh(); });
+  $("clearBtn").addEventListener("click", function () { state.runs[state.active] = ""; state.sample = false; save(); refresh(); $("paste").focus(); });
+  $("sampleBtn").addEventListener("click", function () { loadSample(); save(); $("xSide").value = state.pod.xSide; $("ySide").value = state.pod.ySide; $("xDist").value = ""; $("yDist").value = ""; refresh(); });
+  ["xSide", "ySide", "xDist", "yDist"].forEach(function (id) {
+    $(id).addEventListener("input", function () { state.pod[id] = $(id).value; save(); refresh(); });
+  });
+  $("copyBtn").addEventListener("click", function () {
+    var text = $("avgCode").textContent;
+    function fallback() {
+      var r = document.createRange(); r.selectNodeContents($("avgCode"));
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      $("copyNote").textContent = "Selected. Press Ctrl+C (or ⌘C) to copy.";
+    }
+    try {
+      navigator.clipboard.writeText(text).then(function () { $("copyNote").textContent = "Copied."; }, fallback);
+    } catch (e) { fallback(); }
+  });
+  refresh();
+})();
+</script>
+</body>
+</html>
